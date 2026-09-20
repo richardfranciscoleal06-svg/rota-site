@@ -1,0 +1,57 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  * {
+    @apply border-rota-border;
+  }
+  body {
+    @apply bg-rota-black text-rota-white font-sans antialiased;
+  }
+  ::selection {
+    @apply bg-rota-gold/30 text-rota-white;
+  }
+}
+
+@layer components {
+  .rota-card {
+    @apply bg-rota-card border border-rota-border rounded-lg;
+  }
+  .rota-input {
+    @apply bg-rota-dark border border-rota-border rounded-md px-3 py-2 text-sm text-rota-white placeholder-rota-muted focus:outline-none focus:border-rota-gold/50 transition-colors;
+  }
+  .rota-btn {
+    @apply inline-flex items-center justify-center gap-2 px-4 py-2 rounded-md text-sm font-semibold transition-all duration-200 disabled:opacity-50 disabled:cursor-not-allowed;
+  }
+  .rota-btn-green {
+    @apply rota-btn bg-rota-green hover:bg-rota-green-light text-white;
+  }
+  .rota-btn-red {
+    @apply rota-btn bg-rota-red hover:bg-rota-red-light text-white;
+  }
+  .rota-btn-gold {
+    @apply rota-btn bg-rota-gold hover:bg-rota-gold-light text-black;
+  }
+  .rota-btn-ghost {
+    @apply rota-btn bg-transparent hover:bg-rota-card text-rota-light hover:text-rota-white;
+  }
+  .rota-badge {
+    @apply inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded text-xs font-semibold uppercase tracking-wide;
+  }
+}
+
+::-webkit-scrollbar {
+  width: 6px;
+  height: 6px;
+}
+::-webkit-scrollbar-track {
+  background: #161618;
+}
+::-webkit-scrollbar-thumb {
+  background: #2a2a2e;
+  border-radius: 3px;
+}
+::-webkit-scrollbar-thumb:hover {
+  background: #3a3a3e;
+}
