@@ -1,6 +1,6 @@
 import crypto from 'node:crypto';
 import type { HandlerEvent } from '@netlify/functions';
-import { getDatabase } from '@netlify/database';
+import { getDb } from './db';
 import { MAX_BODY_BYTES, PATENTE_OPTIONS } from '../../../src/types';
 
 export const SESSION_COOKIE_NAME = 'rota_session';
@@ -100,7 +100,7 @@ export async function getSessionUser(event: Pick<HandlerEvent, 'headers'>): Prom
   const session = readSessionCookie(cookieHeader);
   if (!session) return null;
 
-  const db = getDatabase();
+  const db = getDb();
   const rows = await db.sql<{ id: string; id_jogo: string; is_admin: boolean }>`
     SELECT id, id_jogo, is_admin
     FROM members

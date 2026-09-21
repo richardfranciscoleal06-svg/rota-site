@@ -1,5 +1,5 @@
 import type { Handler } from '@netlify/functions';
-import { getDatabase } from '@netlify/database';
+import { getDb } from './_lib/db';
 import { getSessionSecret, readSessionCookie } from './_lib/auth';
 
 export const handler: Handler = async (event) => {
@@ -24,7 +24,7 @@ export const handler: Handler = async (event) => {
   }
 
   try {
-    const db = getDatabase();
+    const db = getDb();
     const rows = await db.sql<{ id: string; id_jogo: string; is_admin: boolean }>`
       SELECT id, id_jogo, is_admin
       FROM members

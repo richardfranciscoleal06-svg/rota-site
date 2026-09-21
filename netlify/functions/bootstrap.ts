@@ -1,6 +1,6 @@
 import crypto from 'node:crypto';
 import type { Handler } from '@netlify/functions';
-import { getDatabase } from '@netlify/database';
+import { getDb } from './_lib/db';
 import { enforceRequestSafety } from './_lib/auth';
 import { MAX_DISCORD_LENGTH, MAX_ID_LENGTH, MAX_NAME_LENGTH } from '../../src/types';
 
@@ -57,7 +57,7 @@ export const handler: Handler = async (event) => {
       };
     }
 
-    const db = getDatabase();
+    const db = getDb();
     const adminCount = await db.sql<{ count: number }>`
       SELECT COUNT(*)::int AS count
       FROM members
