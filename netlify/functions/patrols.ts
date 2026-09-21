@@ -1,5 +1,5 @@
 import type { Handler } from '@netlify/functions';
-import { getDatabase } from '@netlify/database';
+import { getDb } from './_lib/db';
 import { enforceRequestSafety, requireAdmin, requireAuth } from './_lib/auth';
 import { MIN_CREW_TO_START, VIATURAS } from '../../src/types';
 
@@ -31,7 +31,7 @@ export const handler: Handler = async (event) => {
         operadores?: string[];
       };
 
-      const db = getDatabase();
+      const db = getDb();
 
       if (body.action === 'create') {
         const viatura = (body.viatura ?? '').trim();
@@ -188,7 +188,7 @@ export const handler: Handler = async (event) => {
       };
     }
 
-    const db = getDatabase();
+    const db = getDb();
     const rows = await db.sql<{
       id: string;
       viatura: string;

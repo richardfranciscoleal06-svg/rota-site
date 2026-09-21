@@ -1,5 +1,5 @@
 import type { Handler } from '@netlify/functions';
-import { getDatabase } from '@netlify/database';
+import { getDb } from './_lib/db';
 import { enforceRequestSafety, isValidPatente, requireAdmin, requireAuth } from './_lib/auth';
 import { MAX_NAME_LENGTH } from '../../src/types';
 
@@ -23,7 +23,7 @@ export const handler: Handler = async (event) => {
         status?: 'ATIVO' | 'INATIVO';
       };
 
-      const db = getDatabase();
+      const db = getDb();
 
       if (body.action === 'update' && body.id) {
         const admin = await requireAdmin(event);
@@ -161,7 +161,7 @@ export const handler: Handler = async (event) => {
       };
     }
 
-    const db = getDatabase();
+    const db = getDb();
     const rows = await db.sql<{
       id: string;
       nome: string;

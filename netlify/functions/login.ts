@@ -1,6 +1,6 @@
 import crypto from 'node:crypto';
 import type { Handler } from '@netlify/functions';
-import { getDatabase } from '@netlify/database';
+import { getDb } from './_lib/db';
 import { buildSessionCookie, enforceRequestSafety, getSessionSecret } from './_lib/auth';
 
 const LOGIN_ATTEMPT_WINDOW_MS = 15 * 60 * 1000;
@@ -70,7 +70,7 @@ export const handler: Handler = async (event) => {
       };
     }
 
-    const db = getDatabase();
+    const db = getDb();
     const rows = await db.sql<{ id: string; id_jogo: string; is_admin: boolean; senha_hash: string; senha_salt: string }>`
       SELECT id, id_jogo, is_admin, senha_hash, senha_salt
       FROM members

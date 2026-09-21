@@ -1,5 +1,5 @@
 import type { Handler } from '@netlify/functions';
-import { getDatabase } from '@netlify/database';
+import { getDb } from './_lib/db';
 import { enforceRequestSafety, requireAdmin, requireAuth } from './_lib/auth';
 import { MAX_RESUMO_LENGTH } from '../../src/types';
 
@@ -57,7 +57,7 @@ export const handler: Handler = async (event) => {
         resumo?: string;
       };
 
-      const db = getDatabase();
+      const db = getDb();
 
       if (body.action === 'create') {
         const patrolId = (body.patrolId ?? '').trim();
@@ -353,7 +353,7 @@ export const handler: Handler = async (event) => {
       };
     }
 
-    const db = getDatabase();
+    const db = getDb();
     const rows = await db.sql<{
       id: string;
       enviado_por: string;

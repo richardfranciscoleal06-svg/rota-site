@@ -1,5 +1,5 @@
 import type { Handler } from '@netlify/functions';
-import { getDatabase } from '@netlify/database';
+import { getDb } from './_lib/db';
 import { enforceRequestSafety, requireAdmin } from './_lib/auth';
 
 export const handler: Handler = async (event) => {
@@ -24,7 +24,7 @@ export const handler: Handler = async (event) => {
       }
 
       const body = JSON.parse(event.body ?? '{}') as { action?: string; id?: string };
-      const db = getDatabase();
+      const db = getDb();
 
       if (body.action === 'approve' && body.id) {
         const rows = await db.sql<{
@@ -119,7 +119,7 @@ export const handler: Handler = async (event) => {
       };
     }
 
-    const db = getDatabase();
+    const db = getDb();
     const rows = await db.sql<{
       id: string;
       nome: string;

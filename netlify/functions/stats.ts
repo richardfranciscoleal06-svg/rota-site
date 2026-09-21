@@ -1,5 +1,5 @@
 import type { Handler } from '@netlify/functions';
-import { getDatabase } from '@netlify/database';
+import { getDb } from './_lib/db';
 
 const formatNumber = (value: number | null | undefined) =>
   typeof value === 'number' && Number.isFinite(value) ? value : 0;
@@ -29,7 +29,7 @@ const computeTendency = (current: number, previous: number) => {
 
 export const handler: Handler = async () => {
   try {
-    const db = getDatabase();
+    const db = getDb();
     const now = new Date();
     const { currentStart, currentEnd, previousStart, previousEnd } = getPreviousMonthRange(now);
 
