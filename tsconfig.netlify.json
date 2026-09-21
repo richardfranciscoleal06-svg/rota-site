@@ -16,5 +16,5 @@
       "@/*": ["src/*"]
     }
   },
-  "include": ["netlify/functions/**/*.ts"]
+  "include": ["netlify/functions/**/*.ts", "api/**/*.ts", "_server/**/*.ts"]
 }
