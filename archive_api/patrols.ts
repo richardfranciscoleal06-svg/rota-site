@@ -89,11 +89,13 @@ export async function GET(request: Request): Promise<Response> {
       .single();
 
     if (error || !data) {
-      return json({ error: 'Não foi possível iniciar a patrulha.' }, 500);
-    }
-
-    return json({ ok: true, id: data.id });
-  }
+  console.error("Erro na inserção Supabase:", error);
+  // Devolve o erro real da base de dados para o frontend
+  return json({ 
+    error: error?.message || 'Não foi possível iniciar a patrulha.',
+    detalhes: error 
+  }, 500);
+}
 
   if (action === 'stop') {
     const id = String(bodyObj.id ?? '');
