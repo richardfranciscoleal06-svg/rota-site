@@ -65,7 +65,7 @@ export async function GET(request: Request): Promise<Response> {
   const bodyObj = body as Record<string, unknown>;
   const action = String(bodyObj.action ?? '');
 
-  if (action === 'create') {
+ if (action === 'create') {
     const viatura = String(bodyObj.viatura ?? '').trim();
 
     const operadoresRaw = bodyObj.operadores;
@@ -77,6 +77,7 @@ export async function GET(request: Request): Promise<Response> {
       return json({ error: 'Selecione uma viatura e pelo menos um operador.' }, 400);
     }
 
+    // === SUBSTITUA A PARTIR DAQUI ===
     const { data, error } = await client
       .from('patrol_sessions')
       .insert({
@@ -84,18 +85,20 @@ export async function GET(request: Request): Promise<Response> {
         operators,
         status: 'ativa',
         started_at: new Date().toISOString(),
+        created_at: new Date().toISOString(), // <-- Linha adicionada aqui
       })
       .select('id')
       .single();
 
     if (error || !data) {
-  console.error("Erro na inserção Supabase:", error);
-  // Devolve o erro real da base de dados para o frontend
-  return json({ 
-    error: error?.message || 'Não foi possível iniciar a patrulha.',
-    detalhes: error 
-  }, 500);
-}
+      // Adicionei este console.log para ver o erro real no terminal, caso volte a falhar
+      console.error("ERRO SUPABASE:", error); 
+      return json({ error: error?.message || 'Não foi possível iniciar a patrulha.' }, 500);
+    }
+    // === ATÉ AQUI ==
+    
+    return json({ ok: true, id: data.id });
+  }
 
   if (action === 'stop') {
     const id = String(bodyObj.id ?? '');
