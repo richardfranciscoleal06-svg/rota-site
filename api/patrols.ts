@@ -62,8 +62,7 @@ if (action === 'create') {
   if (!viatura || operators.length === 0) {
     return json({ error: 'Selecione uma viatura e pelo menos um operador.' }, 400);
   }
-
-  // ...resto igual
+  
 }
 
     if (!viatura || operators.length === 0) {
