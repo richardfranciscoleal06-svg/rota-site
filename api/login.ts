@@ -1,5 +1,5 @@
-import { buildCookieString, signSession, verifyPassword } from './lib/auth';
-import { getSupabaseClient } from './lib/supabase';
+import { buildCookieString, signSession, verifyPassword } from './lib/auth.js';
+import { getSupabaseClient } from './lib/supabase.js';
 
 function json(payload: unknown, status = 200) {
   return new Response(JSON.stringify(payload), {

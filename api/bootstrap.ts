@@ -1,5 +1,5 @@
-import { hashPassword } from './lib/auth';
-import { getSupabaseClient } from './lib/supabase';
+import { hashPassword } from './lib/auth.js';
+import { getSupabaseClient } from './lib/supabase.js';
 
 function json(payload: unknown, status = 200) {
   return new Response(JSON.stringify(payload), {

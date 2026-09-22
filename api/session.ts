@@ -1,4 +1,4 @@
-import { parseCookieHeader, verifySession } from './lib/auth';
+import { parseCookieHeader, verifySession } from './lib/auth.js';
 
 function json(payload: unknown, status = 200) {
   return new Response(JSON.stringify(payload), {
