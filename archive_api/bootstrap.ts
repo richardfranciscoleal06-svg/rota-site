@@ -14,12 +14,18 @@ export async function POST(request: Request): Promise<Response> {
   }
 
   const token = process.env.BOOTSTRAP_TOKEN ?? '';
-  let body: { token?: string; nome?: string; sobrenome?: string; discordId?: string; idJogo?: string; senha?: string };
+  let parsed: unknown;
   try {
-    body = await request.json();
+    parsed = await request.json();
   } catch {
     return json({ error: 'Corpo da requisição inválido' }, 400);
   }
+
+  if (!parsed || typeof parsed !== 'object') {
+    return json({ error: 'Corpo da requisição inválido' }, 400);
+  }
+
+  const body = parsed as { token?: string; nome?: string; sobrenome?: string; discordId?: string; idJogo?: string; senha?: string };
 
   if (!token || body.token !== token) {
     return json({ error: 'Bootstrap não autorizado.' }, 404);

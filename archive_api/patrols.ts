@@ -34,7 +34,13 @@ export async function GET(request: Request): Promise<Response> {
       operators?: unknown[] | null;
       started_at?: string | null;
       status?: string | null;
-    }>).map((item) => ({
+    }>).map((item: {
+      id: string | number;
+      viatura?: string | null;
+      operators?: unknown[] | null;
+      started_at?: string | null;
+      status?: string | null;
+    }) => ({
       id: String(item.id),
       viatura: String(item.viatura ?? ''),
       operadores: Array.isArray(item.operators)

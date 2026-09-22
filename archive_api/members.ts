@@ -48,7 +48,8 @@ export async function GET(request: Request): Promise<Response> {
       return json({ error: 'Não foi possível listar membros.' }, 500);
     }
 
-    const members = (data ?? []).map((member) => {
+    const rows = (data ?? []) as Record<string, unknown>[];
+    const members = rows.map((member: Record<string, unknown>) => {
       const normalized = normalizeMember(member);
 
       if (!session.isAdmin) {

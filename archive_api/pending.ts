@@ -36,14 +36,15 @@ export async function GET(request: Request): Promise<Response> {
       return json({ error: 'Não foi possível carregar solicitações.' }, 500);
     }
 
-    const pending = (data ?? []).map((item) => ({
+    const rows = (data ?? []) as Record<string, unknown>[];
+    const pending = rows.map((item: Record<string, unknown>) => ({
       id: String(item.id),
       nome: String(item.nome),
       sobrenome: String(item.sobrenome),
       rgDiscord: String(item.discord_id),
       idMilitar: String(item.id_jogo),
       senha: '',
-      dataSolicitacao: item.created_at ? new Date(item.created_at).toISOString() : new Date().toISOString(),
+      dataSolicitacao: item.created_at ? new Date(String(item.created_at)).toISOString() : new Date().toISOString(),
     }));
 
     return json({ pending });

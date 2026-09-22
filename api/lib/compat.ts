@@ -14,7 +14,6 @@ function toHeaderValue(value: string | string[] | undefined): string | undefined
 function normalizeBody(value: unknown): BodyInit | undefined {
   if (typeof value === 'undefined' || value === null) return undefined;
   if (typeof value === 'string') return value;
-  if (Buffer.isBuffer(value)) return value;
   if (value instanceof Uint8Array) return value;
   if (typeof value === 'object') return JSON.stringify(value);
   return String(value);

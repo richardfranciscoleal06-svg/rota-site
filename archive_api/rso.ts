@@ -28,7 +28,8 @@ export async function GET(request: Request): Promise<Response> {
       return json({ error: 'Não foi possível carregar relatórios.' }, 500);
     }
 
-    const reports = (data ?? []).map((item) => ({
+    const rows = (data ?? []) as Record<string, unknown>[];
+    const reports = rows.map((item: Record<string, unknown>) => ({
       id: String(item.id),
       patrolId: item.patrol_id ? String(item.patrol_id) : undefined,
       enviadoPor: String(item.enviado_por),
@@ -43,7 +44,7 @@ export async function GET(request: Request): Promise<Response> {
       bombas: Number(item.bombas ?? 0),
       dinheiroMarcado: Number(item.dinheiro_marcado ?? 0),
       resumo: String(item.resumo ?? ''),
-      dataEnvio: item.created_at ? new Date(item.created_at).toISOString() : new Date().toISOString(),
+      dataEnvio: item.created_at ? new Date(String(item.created_at)).toISOString() : new Date().toISOString(),
       status: String(item.status ?? 'pending') as 'pending' | 'validated' | 'rejected',
     }));
 
@@ -120,8 +121,4 @@ export async function POST(request: Request): Promise<Response> {
   } catch {
     return json({ error: 'Sessão não autenticada.' }, 401);
   }
-}
-
-export async function POST(request: Request): Promise<Response> {
-  return GET(request);
 }

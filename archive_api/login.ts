@@ -13,13 +13,18 @@ export async function POST(request: Request): Promise<Response> {
     return json({ error: 'Método não permitido' }, 405);
   }
 
-  let body: { id?: string; password?: string };
+  let parsed: unknown;
   try {
-    body = await request.json();
+    parsed = await request.json();
   } catch {
     return json({ error: 'Corpo da requisição inválido' }, 400);
   }
 
+  if (!parsed || typeof parsed !== 'object') {
+    return json({ error: 'Corpo da requisição inválido' }, 400);
+  }
+
+  const body = parsed as { id?: string; password?: string };
   const id = String(body.id ?? '').trim();
   const password = String(body.password ?? '');
 
