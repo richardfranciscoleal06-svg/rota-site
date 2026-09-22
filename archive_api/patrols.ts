@@ -86,16 +86,26 @@ export async function POST(request: Request): Promise<Response> {
       return json({ ok: true, id: data.id });
     }
 
-    if (action === 'stop') {
-      const id = String(bodyObj.id ?? '');
-      if (!id) return json({ error: 'ID da patrulha obrigatório.' }, 400);
+if (action === 'stop') {
+      const id = String(bodyObj.id ?? '').trim();
+      if (!id) {
+        return json({ error: 'ID da patrulha obrigatório.' }, 400);
+      }
 
+      // Converte explicitamente ou valida se o ID é uma string válida antes de atualizar
       const { error } = await client
         .from('patrol_sessions')
-        .update({ status: 'encerrada', ended_at: new Date().toISOString() })
+        .update({
+          status: 'encerrada',
+          ended_at: new Date().toISOString(),
+        })
         .eq('id', id);
 
-      if (error) return json({ error: 'Não foi possível encerrar.' }, 500);
+      if (error) {
+        console.error("ERRO SUPABASE STOP:", error);
+        return json({ error: 'Não foi possível encerrar a patrulha.', detalhes: error.message }, 500);
+      }
+
       return json({ ok: true });
     }
 
