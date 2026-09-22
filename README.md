@@ -9,11 +9,11 @@ Aplicação React + Vite + TypeScript para o painel interno da ROTA Jaguaré, co
 - TypeScript
 - Tailwind CSS
 - Supabase
-- Vercel/Serverless API routes
+- Vercel serverless API routes
 
 ## Requisitos
 
-- Node.js 20+
+- Node.js 24.x (obrigatório para o Vercel)
 - npm
 - Conta no Supabase
 
@@ -28,6 +28,8 @@ Aplicação React + Vite + TypeScript para o painel interno da ROTA Jaguaré, co
    - SUPABASE_URL: URL do projeto Supabase
    - SUPABASE_SERVICE_ROLE_KEY: chave de serviço do projeto
    - SUPABASE_ANON_KEY: chave anônima para uso do frontend
+   - VITE_SUPABASE_URL: mesma URL do projeto para o frontend
+   - VITE_SUPABASE_ANON_KEY: mesma chave anônima para o frontend
    - BOOTSTRAP_TOKEN: token secreto para criar o primeiro administrador pelo endpoint de bootstrap
    - NODE_ENV: use `development` no ambiente local
 4. Rode o schema em `supabase/schema.sql` no SQL Editor do Supabase.

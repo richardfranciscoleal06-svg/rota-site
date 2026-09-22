@@ -28,10 +28,18 @@ export default async function handler(request: Request): Promise<Response> {
       return json({ error: 'Não foi possível listar patrulhas.' }, 500);
     }
 
-    const patrols = (data ?? []).map((item) => ({
+    const patrols = ((data ?? []) as Array<{
+      id: string | number;
+      viatura?: string | null;
+      operators?: unknown[] | null;
+      started_at?: string | null;
+      status?: string | null;
+    }>).map((item) => ({
       id: String(item.id),
-      viatura: String(item.viatura),
-      operadores: Array.isArray(item.operators) ? item.operators.map((op) => String(op)) : [],
+      viatura: String(item.viatura ?? ''),
+      operadores: Array.isArray(item.operators)
+        ? item.operators.map((op: unknown) => String(op))
+        : [],
       inicio: item.started_at ? new Date(item.started_at).getTime() : Date.now(),
       status: item.status === 'encerrada' ? 'encerrada' : 'ativa',
     }));

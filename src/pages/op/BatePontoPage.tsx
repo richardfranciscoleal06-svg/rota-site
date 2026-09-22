@@ -8,32 +8,33 @@ export default function BatePontoPage() {
   const [viatura, setViatura] = useState<string>(VIATURAS[0]);
   const [crew, setCrew] = useState<Record<string, string>>({});
   const [elapsed, setElapsed] = useState(0);
-  const [active, setActive] = useState(false);
-  const [patrulhaId, setPatrulhaId] = useState<string | null>(null);
   const [error, setError] = useState('');
 
+  const currentPatrol = patrols[0] ?? null;
+  const active = Boolean(currentPatrol);
+  const patrulhaId = currentPatrol?.id ?? null;
+
   useEffect(() => {
-    if (!patrols.length) {
-      setActive(false);
-      setPatrulhaId(null);
+    if (!currentPatrol) {
       setElapsed(0);
       return;
     }
 
-    const current = patrols[0];
     const now = Date.now();
-    const started = current.inicio ?? now;
-    const nextElapsed = Math.max(0, Math.floor((now - started) / 1000));
-    setPatrulhaId(current.id);
-    setElapsed(nextElapsed);
-    setActive(true);
-  }, [patrols]);
+    const started = currentPatrol.inicio ?? now;
+    setElapsed(Math.max(0, Math.floor((now - started) / 1000)));
+  }, [currentPatrol]);
 
   useEffect(() => {
     if (!active) return;
-    const interval = setInterval(() => setElapsed((p) => p + 1), 1000);
+    const interval = setInterval(() => {
+      if (!currentPatrol) return;
+      const now = Date.now();
+      const started = currentPatrol.inicio ?? now;
+      setElapsed(Math.max(0, Math.floor((now - started) / 1000)));
+    }, 1000);
     return () => clearInterval(interval);
-  }, [active]);
+  }, [active, currentPatrol]);
 
   const formatTime = (s: number) => {
     const h = Math.floor(s / 3600);
@@ -52,14 +53,10 @@ export default function BatePontoPage() {
 
     try {
       setError('');
-      const resultId = await startPatrol({
+      await startPatrol({
         viatura,
         operadores: filledCrew.map((r) => crew[r]),
       });
-
-      setPatrulhaId(resultId ?? null);
-      setElapsed(0);
-      setActive(Boolean(resultId));
     } catch (error) {
       setError(error instanceof Error ? error.message : 'Não foi possível iniciar a patrulha.');
     }
@@ -67,14 +64,12 @@ export default function BatePontoPage() {
 
   const handleStop = async () => {
     if (!patrulhaId) {
-      setActive(false);
       return;
     }
 
     try {
+      setError('');
       await endPatrol(patrulhaId);
-      setActive(false);
-      setPatrulhaId(null);
     } catch (error) {
       setError(error instanceof Error ? error.message : 'Não foi possível encerrar a patrulha.');
     }
