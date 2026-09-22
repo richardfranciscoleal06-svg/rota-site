@@ -48,13 +48,23 @@ export default async function handler(request: Request): Promise<Response> {
     return json({ error: 'Corpo inválido.' }, 400);
   }
 
-  const action = String((body as Record<string, unknown>).action ?? '');
+ const bodyObj = body as Record<string, unknown>;
+const action = String(bodyObj.action ?? '');
 
-  if (action === 'create') {
-    const viatura = String((body as Record<string, unknown>).viatura ?? '').trim();
-    const operators = Array.isArray((body as Record<string, unknown>).operadores)
-      ? (body as Record<string, unknown>).operadores.map((item) => String(item))
-      : [];
+if (action === 'create') {
+  const viatura = String(bodyObj.viatura ?? '').trim();
+
+  const operadoresRaw = bodyObj.operadores;
+  const operators = Array.isArray(operadoresRaw)
+    ? operadoresRaw.map((item) => String(item))
+    : [];
+
+  if (!viatura || operators.length === 0) {
+    return json({ error: 'Selecione uma viatura e pelo menos um operador.' }, 400);
+  }
+
+  // ...resto igual
+}
 
     if (!viatura || operators.length === 0) {
       return json({ error: 'Selecione uma viatura e pelo menos um operador.' }, 400);
