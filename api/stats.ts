@@ -7,7 +7,7 @@ function json(payload: unknown, status = 200) {
   });
 }
 
-export default async function handler(_request: Request): Promise<Response> {
+export async function GET(_request: Request): Promise<Response> {
   const client = getSupabaseClient();
 
   const [membersResult, patrolsResult, reportsResult] = await Promise.all([

@@ -8,7 +8,7 @@ function jsonResponse(payload: unknown, status = 200) {
   });
 }
 
-export default async function handler(request: Request): Promise<Response> {
+export async function POST(request: Request): Promise<Response> {
   if (request.method !== 'POST') {
     return jsonResponse({ error: 'Método não permitido' }, 405);
   }

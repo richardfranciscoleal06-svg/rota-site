@@ -24,15 +24,20 @@ function normalizeMember(member: Record<string, unknown>) {
   return normalized;
 }
 
-export default async function handler(request: Request): Promise<Response> {
+function getSessionOrThrow(request: Request) {
   const sessionToken = parseCookieHeader(request.headers.get('cookie')).session;
   const session = sessionToken ? verifySession(sessionToken) : null;
 
   if (!session) {
-    return json({ error: 'Sessão não autenticada.' }, 401);
+    throw new Error('Sessão não autenticada.');
   }
 
-  if (request.method === 'GET') {
+  return session;
+}
+
+export async function GET(request: Request): Promise<Response> {
+  try {
+    const session = getSessionOrThrow(request);
     const client = getSupabaseClient();
     const { data, error } = await client
       .from('members')
@@ -62,67 +67,71 @@ export default async function handler(request: Request): Promise<Response> {
     });
 
     return json({ members });
+  } catch {
+    return json({ error: 'Sessão não autenticada.' }, 401);
   }
+}
 
-  if (request.method !== 'POST') {
-    return json({ error: 'Método não permitido' }, 405);
-  }
-
-  const body = await request.json().catch(() => null);
-  if (!body || typeof body !== 'object') {
-    return json({ error: 'Corpo inválido.' }, 400);
-  }
-
-  if (!session.isAdmin) {
-    return json({ error: 'Acesso restrito ao comando.' }, 403);
-  }
-
-  const client = getSupabaseClient();
-  const action = String((body as Record<string, unknown>).action ?? '');
-
-  if (action === 'update') {
-    const id = String((body as Record<string, unknown>).id ?? '');
-    const patch = (body as Record<string, unknown>);
-    delete patch.action;
-    delete patch.id;
-
-    const payload: Record<string, unknown> = {};
-
-    for (const [key, value] of Object.entries(patch)) {
-      const dbKey = key === 'idJogo' ? 'id_jogo' : key === 'discordId' ? 'discord_id' : key === 'horasPatrulha' ? 'horas_patrulha' : key === 'apreensoesRs' ? 'apreensoes_rs' : key === 'isAdmin' ? 'is_admin' : key;
-      payload[dbKey] = value;
+export async function POST(request: Request): Promise<Response> {
+  try {
+    const session = getSessionOrThrow(request);
+    const body = await request.json().catch(() => null);
+    if (!body || typeof body !== 'object') {
+      return json({ error: 'Corpo inválido.' }, 400);
     }
 
-    const { error } = await client.from('members').update(payload).eq('id', id);
-    if (error) {
-      return json({ error: 'Não foi possível atualizar o membro.' }, 500);
+    if (!session.isAdmin) {
+      return json({ error: 'Acesso restrito ao comando.' }, 403);
     }
 
-    return json({ ok: true });
+    const client = getSupabaseClient();
+    const action = String((body as Record<string, unknown>).action ?? '');
+
+    if (action === 'update') {
+      const id = String((body as Record<string, unknown>).id ?? '');
+      const patch = body as Record<string, unknown>;
+      delete patch.action;
+      delete patch.id;
+
+      const payload: Record<string, unknown> = {};
+      for (const [key, value] of Object.entries(patch)) {
+        const dbKey = key === 'idJogo' ? 'id_jogo' : key === 'discordId' ? 'discord_id' : key === 'horasPatrulha' ? 'horas_patrulha' : key === 'apreensoesRs' ? 'apreensoes_rs' : key === 'isAdmin' ? 'is_admin' : key;
+        payload[dbKey] = value;
+      }
+
+      const { error } = await client.from('members').update(payload).eq('id', id);
+      if (error) {
+        return json({ error: 'Não foi possível atualizar o membro.' }, 500);
+      }
+
+      return json({ ok: true });
+    }
+
+    if (action === 'delete') {
+      const id = String((body as Record<string, unknown>).id ?? '');
+      if (!id) {
+        return json({ error: 'ID do membro obrigatório.' }, 400);
+      }
+
+      const { error } = await client.from('members').delete().eq('id', id);
+      if (error) {
+        return json({ error: 'Não foi possível remover o membro.' }, 500);
+      }
+
+      return json({ ok: true });
+    }
+
+    if (action === 'reset-accounting') {
+      const { error } = await client.from('members').update({ horas_patrulha: 0, apreensoes_rs: 0 }).neq('id', '');
+      if (error) {
+        return json({ error: 'Não foi possível resetar contabilidade.' }, 500);
+      }
+
+      return json({ ok: true });
+    }
+
+    return json({ error: 'Ação inválida.' }, 400);
+  } catch {
+    return json({ error: 'Sessão não autenticada.' }, 401);
   }
-
-  if (action === 'delete') {
-    const id = String((body as Record<string, unknown>).id ?? '');
-    if (!id) {
-      return json({ error: 'ID do membro obrigatório.' }, 400);
-    }
-
-    const { error } = await client.from('members').delete().eq('id', id);
-    if (error) {
-      return json({ error: 'Não foi possível remover o membro.' }, 500);
-    }
-
-    return json({ ok: true });
-  }
-
-  if (action === 'reset-accounting') {
-    const { error } = await client.from('members').update({ horas_patrulha: 0, apreensoes_rs: 0 }).neq('id', '');
-    if (error) {
-      return json({ error: 'Não foi possível resetar contabilidade.' }, 500);
-    }
-
-    return json({ ok: true });
-  }
-
-  return json({ error: 'Ação inválida.' }, 400);
 }

@@ -8,7 +8,7 @@ function json(payload: unknown, status = 200) {
   });
 }
 
-export default async function handler(request: Request): Promise<Response> {
+export async function GET(request: Request): Promise<Response> {
   const sessionToken = parseCookieHeader(request.headers.get('cookie')).session;
   const session = sessionToken ? verifySession(sessionToken) : null;
 
