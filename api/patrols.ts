@@ -48,33 +48,31 @@ export default async function handler(request: Request): Promise<Response> {
     return json({ error: 'Corpo inválido.' }, 400);
   }
 
- const bodyObj = body as Record<string, unknown>;
-const action = String(bodyObj.action ?? '');
+  const bodyObj = body as Record<string, unknown>;
+  const action = String(bodyObj.action ?? '');
 
-if (action === 'create') {
-  const viatura = String(bodyObj.viatura ?? '').trim();
+  if (action === 'create') {
+    const viatura = String(bodyObj.viatura ?? '').trim();
 
-  const operadoresRaw = bodyObj.operadores;
-  const operators = Array.isArray(operadoresRaw)
-    ? operadoresRaw.map((item) => String(item))
-    : [];
-
-  if (!viatura || operators.length === 0) {
-    return json({ error: 'Selecione uma viatura e pelo menos um operador.' }, 400);
-  }
-  
-}
+    const operadoresRaw = bodyObj.operadores;
+    const operators = Array.isArray(operadoresRaw)
+      ? operadoresRaw.map((item) => String(item))
+      : [];
 
     if (!viatura || operators.length === 0) {
       return json({ error: 'Selecione uma viatura e pelo menos um operador.' }, 400);
     }
 
-    const { data, error } = await client.from('patrol_sessions').insert({
-      viatura,
-      operators,
-      status: 'ativa',
-      started_at: new Date().toISOString(),
-    }).select('id').single();
+    const { data, error } = await client
+      .from('patrol_sessions')
+      .insert({
+        viatura,
+        operators,
+        status: 'ativa',
+        started_at: new Date().toISOString(),
+      })
+      .select('id')
+      .single();
 
     if (error || !data) {
       return json({ error: 'Não foi possível iniciar a patrulha.' }, 500);
@@ -84,15 +82,18 @@ if (action === 'create') {
   }
 
   if (action === 'stop') {
-    const id = String((body as Record<string, unknown>).id ?? '');
+    const id = String(bodyObj.id ?? '');
     if (!id) {
       return json({ error: 'ID da patrulha obrigatório.' }, 400);
     }
 
-    const { error } = await client.from('patrol_sessions').update({
-      status: 'encerrada',
-      ended_at: new Date().toISOString(),
-    }).eq('id', id);
+    const { error } = await client
+      .from('patrol_sessions')
+      .update({
+        status: 'encerrada',
+        ended_at: new Date().toISOString(),
+      })
+      .eq('id', id);
 
     if (error) {
       return json({ error: 'Não foi possível encerrar a patrulha.' }, 500);
